@@ -1,11 +1,58 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu} = require('electron');
 
 let mainWindow;
 
-function createWindow () {
-    mainWindow = new BrowserWindow();
+function createMainMenu() {
+    let template = [
+        {
+            label: 'Map',
+            submenu: [
+                {
+                    label: 'Create',
+                    click() {
+                        mainWindow.webContents.send('command', 'create');
+                    }
+                },
+                {
+                    label: 'Open',
+                    click() {
+                        mainWindow.webContents.send('command', 'open');
+                    }
+                },
+                {
+                    label: 'Save',
+                    click() {
+                        mainWindow.webContents.send('command', 'save');
+                    }
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    role: 'close'
+                }
+            ]
+        }  
+    ];
 
+    let menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu);
+}
+
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        title: 'IP Mapper',
+        show: false
+    });
+
+    createMainMenu();
+    mainWindow.maximize();
     mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+    });
+
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
