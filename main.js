@@ -8,15 +8,15 @@ function createMainMenu() {
             label: 'Map',
             submenu: [
                 {
-                    label: 'Create',
-                    click() {
-                        mainWindow.webContents.send('command', 'create');
-                    }
-                },
-                {
                     label: 'Open',
                     click() {
                         mainWindow.webContents.send('command', 'open');
+                    }
+                },
+                {
+                    label: 'IP addresses',
+                    click() {
+                        mainWindow.webContents.send('command', 'ip-list');
                     }
                 },
                 {
