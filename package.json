@@ -1,0 +1,24 @@
+{
+  "name": "ip-mapper",
+  "version": "1.0.0",
+  "description": "Simple desktop app to show the list of IP addresses on a map.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilich/ip-mapper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ilich/ip-mapper/issues"
+  },
+  "homepage": "https://github.com/ilich/ip-mapper#readme",
+  "private": true,
+  "devDependencies": {
+    "electron": "^1.4.7"
+  }
+}

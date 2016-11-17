@@ -1,0 +1,9 @@
+{
+  "name": "ip-mapper",
+  "description": "Simple desktop app to show the list of IP addresses on a map.",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
