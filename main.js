@@ -49,8 +49,6 @@ function createWindow() {
     mainWindow.maximize();
     mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
-    mainWindow.webContents.openDevTools();
-
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });

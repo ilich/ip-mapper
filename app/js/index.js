@@ -69,17 +69,26 @@ function mapWidget() {
     map.addOverlay(popupOverlay);
 
     map.on('click', function (e) {
-        var feature = map.forEachFeatureAtPixel(e.pixel, (feature) => { return feature; })
+        let feature = map.forEachFeatureAtPixel(e.pixel, (f) => f)
         if (feature) {
-            var coordinates = feature.getGeometry().getCoordinates();
+            let coordinates = feature.getGeometry().getCoordinates();
             popupOverlay.setPosition(coordinates);
-            $popup.popover({
-                'placement': 'top',
-                'html': false,
-                'content': feature.get('name')
-            });
-            
-            $popup.popover('show');
+
+            let msg = feature.get('name');
+            if ($popup.data('bs.popover')) {
+                let popverControl = $popup.data('bs.popover')
+                popverControl.options.content = msg;
+                popverControl.setContent();
+            }
+            else {
+                $popup.popover({
+                    'placement': 'top',
+                    'html': false,
+                    'content': msg
+                });
+                
+                $popup.popover('show');
+            }
         }
         else {
             $popup.popover('destroy');
@@ -90,41 +99,67 @@ function mapWidget() {
         let coordinates = [city.location.longitude, city.location.latitude];
         let location = ol.proj.fromLonLat(coordinates);
 
+        let info = [ ip ];
+        if (city.city && city.city.names) {
+            info.push(city.city.names['en']);
+        }
+
+        if (city.country) {
+            info.push(city.country.iso_code);
+        }
+
         let cityFeature = new ol.Feature({
             geometry: new ol.geom.Point(location),
-            name: `${ip}, ${city.city.names['en']}, ${city.country.iso_code}`
+            name: info.join(', ').trim()
         });
 
         cityFeature.setStyle(cityStyle);
         vectorSource.addFeature(cityFeature);
 
-        mapView.setCenter(ol.proj.fromLonLat(coordinates));
+        return location;
     }
 
     function showOnMap(data) {
-        // TODO
+        vectorSource.clear();
 
+        if (!data) {
+            return;
+        }
+
+        data = data.trim();
+        if (data === '') {
+            return;
+        }
 
         maxmind.open(MAXMIND_DATA,  (err, cities) => {
-            vectorSource.clear();
-
             if (err) {
                 alert(err);
                 return;
             }
 
-            let ip = '8.8.8.8';
-            let city = cities.get(ip);
-            if (!city) {
-                return;
+            let list = data.split(/[\n,;]/);
+            let notFound = [];
+            let lastLocation = null;
+            for (let ip of list) {
+                ip = ip.trim();
+                let city = cities.get(ip);
+                if (!city) {
+                    notFound.push(ip);
+                    continue;
+                }
+
+                lastLocation = addCity(ip, city);
             }
 
-            console.log(ip, city);
+            if (lastLocation) {
+                mapView.setCenter(lastLocation);
+            }
 
-            
-            addCity(ip, city);
-
-            
+            if (notFound.length > 0) {
+                notFound.splice(0, 0, "The following IP addresses were not found:");
+                let msg = notFound.join('\n');
+                alert(msg);
+            }            
         });
     }
 
@@ -161,4 +196,3 @@ ipcRenderer.on('command', (e, arg) => {
 $('#ip-update').click(function () {
     map.refresh();
 });
-
