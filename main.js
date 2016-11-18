@@ -8,15 +8,15 @@ function createMainMenu() {
             label: 'Map',
             submenu: [
                 {
-                    label: 'Open',
+                    label: 'IP Address List',
                     click() {
-                        mainWindow.webContents.send('command', 'open');
+                        mainWindow.webContents.send('command', 'ip-list');
                     }
                 },
                 {
-                    label: 'IP addresses',
+                    label: 'Open',
                     click() {
-                        mainWindow.webContents.send('command', 'ip-list');
+                        mainWindow.webContents.send('command', 'open');
                     }
                 },
                 {
@@ -48,6 +48,8 @@ function createWindow() {
     createMainMenu();
     mainWindow.maximize();
     mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+
+    mainWindow.webContents.openDevTools();
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();

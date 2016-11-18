@@ -20,5 +20,8 @@
   "private": true,
   "devDependencies": {
     "electron": "^1.4.7"
+  },
+  "dependencies": {
+    "maxmind": "^2.1.0"
   }
 }
