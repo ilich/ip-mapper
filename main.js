@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron');
+const {app, BrowserWindow, Menu, dialog} = require('electron');
 
 let mainWindow;
 
@@ -10,19 +10,33 @@ function createMainMenu() {
                 {
                     label: 'IP Address List',
                     click() {
-                        mainWindow.webContents.send('command', 'ip-list');
+                        mainWindow.webContents.send('ip-list');
                     }
                 },
                 {
                     label: 'Open',
                     click() {
-                        mainWindow.webContents.send('command', 'open');
+                        dialog.showOpenDialog(
+                            mainWindow, 
+                            {
+                                properties: [ 'openFile' ]
+                            }, 
+                            (filePaths) => {
+                                if (filePaths.length === 0) {
+                                    return;
+                                }
+
+                                mainWindow.webContents.send('open', filePaths[0]);
+                            }
+                        );
                     }
                 },
                 {
                     label: 'Save',
                     click() {
-                        mainWindow.webContents.send('command', 'save');
+                        dialog.showSaveDialog(mainWindow, {}, (filename) => {
+                            mainWindow.webContents.send('save', filename);
+                        });
                     }
                 },
                 {

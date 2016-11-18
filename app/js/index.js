@@ -1,5 +1,6 @@
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, dialog} = require('electron');
 const maxmind = require('maxmind');
+const fs = require('fs');
 
 function mapWidget() {
     const NEW_YORK = [-73.93, 40.73];
@@ -164,33 +165,55 @@ function mapWidget() {
     }
 
     return {
-        openEditor: function () {
+        open(filename) {
+            fs.readFile(filename, 'utf8', (err, data) => {
+                if (err) {
+                    alert(err);
+                    return;
+                }
+
+                $ipList.val(data);
+                showOnMap(data);
+            });
+        },
+
+        save(filename) {
+            var addresses = $ipList.val().trim();
+            if (addresses === '') {
+                alert('Please add IP addresses to the map first.');
+                return;
+            }
+
+            fs.writeFile(filename, addresses, (err) => {
+                alert(err ? err : "IP address list has been stored.");
+            });
+        },
+
+        openEditor() {
             $gialog.modal('show');
         },
 
-        refresh: function () {
+        refresh() {
             $gialog.modal('hide');
 
-            var ipText = $ipList.val();
-            showOnMap(ipText);
+            var addresses = $ipList.val();
+            showOnMap(addresses);
         }
     };
 }
 
 let map = mapWidget();
 
-ipcRenderer.on('command', (e, arg) => {
-    switch(arg) {
-        case 'ip-list':
-            map.openEditor();
-            break;
+ipcRenderer.on('ip-list', () => {
+    map.openEditor();
+});
 
-        case 'open':
-            break;
+ipcRenderer.on('save', (e, filename) => {
+    map.save(filename);
+});
 
-        case 'save':
-            break;
-    }
+ipcRenderer.on('open', (e, filename) => {
+    map.open(filename);
 });
 
 $('#ip-update').click(function () {
